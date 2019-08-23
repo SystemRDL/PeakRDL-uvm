@@ -31,5 +31,6 @@ except RDLCompileError:
 
 
 file = "test.svh"
-headerfile = uvmGenExporter()
-headerfile.export(root, file)
+exporter = uvmGenExporter()
+exporter.export(root, file)
+exporter.export(root, "output/test_uvmgen")
