@@ -1,0 +1,50 @@
+// parallel interface write enable example
+//
+// parameter defines for this example
+//
+// define a state reg
+reg state_reg{
+   name = "State reg";
+   field {
+      name = "Some state bits";
+      sw=r; hw=w;
+   } lsb_field[16] = 16'hffff;
+};
+
+mem fixed_mem #(longint unsigned word_size = 32,
+    longint unsigned memory_size = word_size * 4096) {
+    mementries = memory_size / word_size ;
+    memwidth = word_size ;
+    sw =rw ;
+};
+addrmap foo{
+        default reset=0;
+		reg {
+		   field {sw=rw; hw=r; counter; hwset; hwclr; swwel;} count_fld[8] = 8'h55;
+		   field {sw=rw; intr; } intr1;
+		   field {sw=rw; intr;} intr2;
+		} intr_reg;
+		
+		reg{
+		   field {sw=rw;hw=w;}  log_err[8] =8'h4;
+		   field {sw=r;hw=w;}  log_value[8] =8'h0;		   
+		} log_reg;		
+		
+		reg {
+		   regwidth=64;
+		   field{sw=rw; hw=na;} field64[64];
+		} bigreg;
+        
+        external fixed_mem mem32;
+	    
+        state_reg state_regs[8] @0x200;
+        state_regs->name = "State regs";	
+
+		addrmap {
+		   reg {
+		      field{sw=rw; hw=na;} field32[32];
+		   } array_reg[8] @0x10;
+		} childmap_32b @0x100;
+} ;
+
+
