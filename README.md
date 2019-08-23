@@ -1,6 +1,5 @@
 # RALBot-uvm
 Generate UVM register model from compiled SystemRDL input
-[![Build Status](https://travis-ci.org/SystemRDL/RALBot-ipxact.svg?branch=master)](https://travis-ci.org/SystemRDL/RALBot-ipxact)
 
 ## Installing(left blank)
 Install from [PyPi](https://pypi.org/project/ralbot-ipxact) using pip:
