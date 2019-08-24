@@ -1,6 +1,6 @@
 from systemrdl import rdltypes
 
-# sw <--> ipxact:access
+# sw <-->:access
 ACCESS_MAP = [
     (rdltypes.AccessType.r,     "RO"),
     (rdltypes.AccessType.rw,    "RW"),
@@ -21,7 +21,7 @@ def sw_from_access(access):
     return None
 
 #-------------------------------------------------------------------------------
-# onwrite <--> ipxact:modifiedWriteValue
+# onwrite <-->:modifiedWriteValue
 MWV_MAP = [
     (rdltypes.OnWriteType.wclr,     "WC"),
     (rdltypes.OnWriteType.woclr,    "W1C"),
@@ -46,7 +46,7 @@ def onwrite_from_mwv(mwv):
     return None
 
 #-------------------------------------------------------------------------------
-# onread <--> ipxact:readAction
+# onread <-->:readAction
 READ_ACTION_MAP = [
     (rdltypes.OnReadType.rclr, "RC"),
     (rdltypes.OnReadType.rset, "RS"),
