@@ -1,7 +1,7 @@
 # RALBot-uvm
 Generate UVM register model from compiled SystemRDL input
 
-## Installing(left blank)
+## Installing
 Install from [PyPi](https://pypi.org/project/ralbot-uvm) using pip:
 
     python3 -m pip install ralbot-uvm

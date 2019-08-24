@@ -17,7 +17,7 @@ setuptools.setup(
     author_email="564193687@qq.com",
     description="Generate UVM register model from compiled SystemRDL input",
     long_description=long_description,
-    #long_description_content_type="text/markdown",
+    long_description_content_type="text/markdown",
     url="https://github.com/zhajio1988/RALBot-uvm",
     packages=['ralbot.uvmgen'],
     include_package_data=True,
