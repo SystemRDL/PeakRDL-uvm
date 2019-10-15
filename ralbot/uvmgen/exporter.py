@@ -229,7 +229,7 @@ endclass\n''' %(self.get_class_name(parent, node), node.get_property("regwidth")
             self.add_uvm_block_content(self.indent*3, "%s[i] = %s::type_id::create($psprintf(\"%s[%%d]\",i), , get_full_name());" % (child.inst_name, self.get_class_name(parentNode, child), child.inst_name))
             self.add_uvm_block_content(self.indent*3, "%s[i].configure(this, \"\");" % (child.inst_name))
             self.add_uvm_block_content(self.indent*3, "%s[i].build();" %(child.inst_name))
-            self.add_uvm_block_content(self.indent*3, "default_map.add_submap(%s[i], `UVM_REG_ADDR_WIDTH'h%x+i*`UVM_REG_ADDR_WIDTH'h%x);" % (child.inst_name, child.raw_address_offset, child.array_stride))
+            self.add_uvm_block_content(self.indent*3, "default_map.add_submap(%s[i].default_map, `UVM_REG_ADDR_WIDTH'h%x+i*`UVM_REG_ADDR_WIDTH'h%x);" % (child.inst_name, child.raw_address_offset, child.array_stride))
             self.add_uvm_block_content(self.indent*2, "end")            
         else:
             self.add_uvm_block_content(self.indent*2,  "%s = %s::type_id::create(\"%s\",,get_full_name());" %(child.inst_name, self.get_class_name(parentNode, child), child.inst_name))
