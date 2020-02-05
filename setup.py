@@ -18,7 +18,7 @@ setuptools.setup(
     description="Generate UVM register model from compiled SystemRDL input",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/zhajio1988/RALBot-uvm",
+    url="https://github.com/SystemRDL/RALBot-uvm",
     packages=['ralbot.uvmgen'],
     include_package_data=True,
     python_requires='>=3.4',
@@ -33,6 +33,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3 :: Only",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -41,7 +42,7 @@ setuptools.setup(
     ),
     project_urls={
         #"Documentation": "TBD",
-        "Source": "https://github.com/zhajio1988/RALBot-uvm",
-        "Tracker": "https://github.com/zhajio1988/RALBot-uvm/issues"
+        "Source": "https://github.com/SystemRDL/RALBot-uvm",
+        "Tracker": "https://github.com/SystemRDL/RALBot-uvm/issues"
     },
 )

@@ -1,3 +1,5 @@
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ralbot-uvm.svg)](https://pypi.org/project/ralbot-uvm)
+
 # RALBot-uvm
 Generate UVM register model from compiled SystemRDL input
 
@@ -39,7 +41,7 @@ Constructor for the uvmGen exporter class
 **Optional Parameters**
 
 * `indentLvl`
-    * Three spaces or four spaces. Default three space. 
+    * String to use for each indent level. Defaults to three spaces.
 
 ### `uvmGenExporter.export(node, path)`
 Perform the export!
