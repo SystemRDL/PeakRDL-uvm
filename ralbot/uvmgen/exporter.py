@@ -122,7 +122,7 @@ class uvmGenExporter:
         self.add_uvm_block_content(content="class %s extends uvm_reg_block;" % node.inst_name)
         self.add_variable_declare_func(node, allNodes)  
         self.add_uvm_block_content('''
-   `uvm_object_utils("%s")
+   `uvm_object_utils(%s)
    function new(string name = "%s");
       super.new(name, UVM_NO_COVERAGE);
    endfunction ''' %(node.inst_name, node.inst_name))
@@ -148,7 +148,7 @@ class uvmGenExporter:
         self.add_uvm_block_content(content="class %s extends uvm_reg_block;" % self.get_class_name(parent, node))
         self.add_variable_declare_func(node, allNodes)  
         self.add_uvm_block_content('''
-   `uvm_object_utils("%s")
+   `uvm_object_utils(%s)
    function new(string name = "%s");
       super.new(name, UVM_NO_COVERAGE);
    endfunction ''' %(self.get_class_name(parent, node), self.get_class_name(parent, node)))
@@ -181,7 +181,7 @@ class uvmGenExporter:
       super.new(name, %0d, UVM_NO_COVERAGE);
    endfunction
 
-   `uvm_object_utils("%s")
+   `uvm_object_utils(%s)
 endclass\n''' %(self.get_class_name(parent, node), node.get_property("regwidth"), self.get_class_name(parent, node)))
     #---------------------------------------------------------------------------
     # generate uvm reg model content function
