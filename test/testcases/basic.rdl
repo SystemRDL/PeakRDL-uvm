@@ -1,0 +1,50 @@
+
+addrmap basic {
+    regfile {
+        reg reg_t{
+            field {sw=rw; hw=r;} f1[15:0] = 1234;
+            field f2_t {sw=rw; hw=r;};
+            f2_t f2[16:16] = 0;
+            f2_t f3[17:17] = 0;
+            field {
+                sw=rw; hw=r;
+                hdl_path_slice = '{"f4"};
+                hdl_path_gate_slice = '{"f4_31_gate", "f4_30_gate"};
+            } f4[31:30] = 0;
+            field {
+                sw=rw; hw=r;
+                hdl_path_slice = '{"f5_29", "f5_28"};
+                hdl_path_gate_slice = '{"f5_gate"};
+            } f5[29:28] = 0;
+        };
+        reg_t r1 @ 0x0;
+        reg_t r2 @ 0x4;
+        reg_t r3 @ 0x8;
+
+        r3.f1->sw=w;
+        r3.f1->reset=200;
+    } foo @ 0x0;
+
+    regfile bar_t {
+        reg {
+            field {sw=rw; hw=r;} f[15:0] = 1234;
+            hdl_path = "r1";
+            hdl_path_gate = "r1_gate";
+        } r1[4] @ 0x0 += 4;
+        hdl_path = "bar";
+        hdl_path_gate = "bar_gate";
+    };
+    
+    bar_t bar[4][3] @ 0x1000 += 0x100;
+    bar_t bar2 @ 0x8000;
+
+    bar2.r1.f->sw=w;
+    bar2.r1.f->reset=200;
+
+    external mem {
+        reg {
+            field {sw=rw; hw=r;} f[15:0] = 1234;
+        } r1[8] @ 0x0 += 4;
+        mementries = 0x100;
+    } xxx @ 0x10000;
+};
