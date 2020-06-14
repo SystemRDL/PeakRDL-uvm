@@ -32,5 +32,5 @@ exporter.export(root,
                 use_uppercase_inst_name=True,
                 reuse_class_definitions=False)
 
-strg = exporter._get_class_name(root)
-print (strg)
+#strg = exporter._get_class_name(root)
+#print (strg)
