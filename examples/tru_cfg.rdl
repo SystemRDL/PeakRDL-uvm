@@ -37,7 +37,7 @@ addrmap trigger_routing_unit {
   default accesswidth = 32;
   default regwidth = 32;
 
-  reg tru_ssrn { 
+  reg { 
     name = "Slave Select Register";
     desc = "The TRU slave select registers (TRU_SSRn) each provide
     slave selection and register locking.";
@@ -77,7 +77,7 @@ addrmap trigger_routing_unit {
 
   } tru_ssrn @0x2000;
 
-  reg tru_mtr { 
+  reg { 
     name = "Master Trigger Register";
     desc = "The TRU master trigger register (TRU_MTR) permits trigger generation 
     through software by writing a trigger master ID value to one of the four fields
@@ -124,7 +124,7 @@ addrmap trigger_routing_unit {
 
   } tru_mtr @0x2004;
 
-  reg tru_erraddr { 
+  reg { 
     name = "Error Address Register";
     desc = "The TRU error address register (TRU_ERRADDR) holds the address 
     from the memory mapped register access generating an access error of TRU registers.";
@@ -161,7 +161,7 @@ addrmap trigger_routing_unit {
 
   } tru_erraddr @0x2010;
 
-  reg tru_stat { 
+  reg { 
     name = "Status Information Register";
     desc = "The TRU status register (TRU_STAT) contains the status of TRU_MTR and 
     TRU_SSRn register writes and status of bus read/write errors.";
@@ -206,7 +206,7 @@ addrmap trigger_routing_unit {
 
   } tru_stat @0x2014;
 
-  reg tru_gctl { 
+  reg { 
     name = "Global Control Register";
     desc = "The TRU global control register (TRU_GCTL) provides register locking, 
     TRU reset, and TRU enable.";
@@ -265,7 +265,7 @@ addrmap trigger_routing_unit {
     
   } tru_gctl @0x2018;
 
-  reg tru_rxdata { 
+  reg { 
     name = "Receive Data Register";
     desc = "Used for storing the received data";
 
@@ -281,5 +281,7 @@ addrmap trigger_routing_unit {
     } rxdata[31:0] = 32'h0;
 
   } tru_rxdata @0x201c;
+
+
 
 };

@@ -15,8 +15,9 @@ class {{get_class_name(node)}} extends uvm_reg;
 {%- endif %}
 {%- if use_uvm_factory %}
     `uvm_object_utils({{get_class_name(node)}})
-{% endif %}
+{%- endif %}
     {{child_insts(node)|indent}}
+
     {{function_new(node)|indent}}
 
     {{function_build(node)|indent}}
@@ -29,9 +30,13 @@ endclass : {{get_class_name(node)}}
 // Child instances
 //------------------------------------------------------------------------------
 {% macro child_insts(node) -%}
-{%- for field in node.fields() -%}
+{% for field in node.fields() -%}
+{%- if is_field_reserved(field) %}
+     uvm_reg_field {{get_inst_name(field)}};
+{%- else %}
 rand uvm_reg_field {{get_inst_name(field)}};
-{% endfor -%}
+{%- endif -%}
+{%- endfor %}
 {%- endmacro %}
 
 

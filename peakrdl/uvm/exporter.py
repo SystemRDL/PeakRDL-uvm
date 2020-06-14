@@ -158,6 +158,7 @@ class UVMExporter:
             'get_class_name': self._get_class_name,
             'get_class_friendly_name': self._get_class_friendly_name,
             'get_inst_name': self._get_inst_name,
+            'is_field_reserved': self._is_field_reserved,
             'get_inst_map_name': self._get_inst_map_name,
             'get_field_access': self._get_field_access,
             'get_reg_access': self._get_reg_access,
@@ -263,6 +264,19 @@ class UVMExporter:
             return node.inst_name.upper()
         else:
             return node.inst_name.lower()
+
+    def _is_field_reserved(self, field: FieldNode) -> bool:
+        """
+        Returns True if the field is reserved
+        """
+
+        # Check if the field is reserved type 
+        is_reserved = re.search("reserved",field.inst_name)
+
+        if is_reserved:
+            return True
+        else:
+            return False
 
     def _get_inst_map_name(self, node: Node) -> str:
         """
