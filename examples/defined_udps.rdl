@@ -1,0 +1,16 @@
+//-----------------------------------------------------------------------------
+// User Defined Properties (UDP)
+//-----------------------------------------------------------------------------
+  // Register access for the map
+  property regaccess_p { type = string; component = reg; default = "RW";}; 
+
+  // Register access address width in bits
+  property address_width_p { type = number; component = addrmap; default = 32;};
+
+  // Base address 
+  property base_address_p { type = longint unsigned; component = addrmap; default = 0x0;};
+
+  // Map name for creation
+  property map_name_p { type = string; component = addrmap; default = "reg_map";};
+
+  // Coverage property
