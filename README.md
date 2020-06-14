@@ -21,7 +21,7 @@ Advantages of this approach are:
 2 - Package includes .git dir, so it's regular Git repository. You can push to your fork right away.  
 
 ## Uninstall   
-pip uninstall systemrdl-compiler  
+pip uninstall PeakRDL-uvm  
 --------------------------------------------------------------------------------
 
 ## Exporter Usage
