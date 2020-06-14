@@ -1,5 +1,7 @@
 import os
 import re
+import datetime
+import time
 
 import jinja2 as jj
 from systemrdl.node import RootNode, Node, RegNode, AddrmapNode, RegfileNode
@@ -10,7 +12,7 @@ from systemrdl import RDLWalker
 from .pre_export_listener import PreExportListener
 
 class UVMExporter:
-
+    
     def __init__(self, **kwargs):
         """
         Constructor for the UVM Exporter class
@@ -73,7 +75,11 @@ class UVMExporter:
         # Used for making the instance name(s) in uppercase or lowercase
         self.use_uppercase_inst_name = False
 
+        # Get the today's date (mm-dd-yyyy)
+        self.today_date = datetime.date.today().strftime('%m-%d-%Y')
 
+        # Get the current time (hh:mm:ss)
+        self.current_time = time.strftime('%H:%M:%S') 
 
     def export(self, node: Node, path: str, **kwargs):
         """
@@ -152,7 +158,11 @@ class UVMExporter:
             'get_class_name': self._get_class_name,
             'get_class_friendly_name': self._get_class_friendly_name,
             'get_inst_name': self._get_inst_name,
+            'get_inst_map_name': self._get_inst_map_name,
             'get_field_access': self._get_field_access,
+            'get_reg_access': self._get_reg_access,
+            'get_address_width': self._get_address_width,
+            'get_base_address': self._get_base_address,
             'get_array_address_offset_expr': self._get_array_address_offset_expr,
             'get_endianness': self._get_endianness,
             'get_bus_width': self._get_bus_width,
@@ -160,7 +170,9 @@ class UVMExporter:
             'roundup_to': self._roundup_to,
             'roundup_pow2': self._roundup_pow2,
             'use_uvm_factory': use_uvm_factory,
-            'use_uvm_reg_enhanced': use_uvm_reg_enhanced
+            'use_uvm_reg_enhanced': use_uvm_reg_enhanced,
+            'get_today_date': self.today_date,
+            'get_current_time': self.current_time
         }
 
         context.update(self.user_template_context)
@@ -252,6 +264,20 @@ class UVMExporter:
         else:
             return node.inst_name.lower()
 
+    def _get_inst_map_name(self, node: Node) -> str:
+        """
+        Returns the address map name
+        """
+
+        amap = node.owning_addrmap
+        amap_name = amap.get_property("map_name_p");
+
+        if amap_name:
+            amap_name = amap_name.upper()
+        else:
+            amap_name = "reg_map"
+
+        return amap_name
 
     def _class_needs_definition(self, node: Node) -> bool:
         """
@@ -364,6 +390,51 @@ class UVMExporter:
         else:
             return "RW"
 
+    def _get_reg_access(self, reg: RegNode) -> str:
+        """
+        Get register's UVM access for the map - string
+        """
+
+        regaccess = reg.get_property("regaccess_p")
+
+        if regaccess:
+            return regaccess
+        else:
+            return "RW"
+
+    def _get_address_width(self, node: Node) -> str:
+        """
+        Returns the address width for the register access
+        """
+
+        amap = node.owning_addrmap
+        address_width = amap.get_property("address_width_p");
+    
+        if address_width:
+            # Convert it to decimal value
+            address_width = int(address_width)
+        else: 
+            # Default value
+            address_width = 32;
+    
+        return address_width 
+
+    def _get_base_address(self, node: Node) -> str:
+        """
+        Returns the base address for the register block 
+        """
+
+        amap = node.owning_addrmap
+        base_address = amap.get_property("base_address_p");
+
+        if base_address:
+            # Convert the value into hexadecimal 
+            # excluding 0x - just the value
+            base_address = hex(base_address)[2:]
+        else:
+            base_address = 0;
+
+        return base_address 
 
     def _get_array_address_offset_expr(self, node: AddressableNode) -> str:
         """

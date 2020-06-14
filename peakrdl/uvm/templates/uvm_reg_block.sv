@@ -5,11 +5,13 @@
 //------------------------------------------------------------------------------
 {% macro class_definition(node) -%}
 {%- if class_needs_definition(node) %}
+//-----------------------------------------------------------------------------
 // {{get_class_friendly_name(node)}}
+//-----------------------------------------------------------------------------
 class {{get_class_name(node)}} extends uvm_reg_block;
 {%- if use_uvm_factory %}
     `uvm_object_utils({{get_class_name(node)}})
-{%- endif %}
+{% endif %}
     {{child_insts(node)|indent}}
     {{function_new(node)|indent}}
 
@@ -44,8 +46,11 @@ endfunction : new
 //------------------------------------------------------------------------------
 {% macro function_build(node) -%}
 virtual function void build();
-    this.default_map = create_map("reg_map", 0, {{get_bus_width(node)}}, {{get_endianness(node)}});
-    {%- for child in node.children() -%}
+    this.default_map = create_map(.name("{{get_inst_map_name(node)}}"),
+                                  .base_addr({{get_address_width(node)}}'h{{get_base_address(node)}}), 
+                                  .n_bytes({{get_bus_width(node)}}), 
+                                  .endian({{get_endianness(node)}}));
+    {% for child in node.children() -%}
         {%- if isinstance(child, RegNode) -%}
             {{uvm_reg.build_instance(child)|indent}}
         {%- elif isinstance(child, (RegfileNode, AddrmapNode)) -%}

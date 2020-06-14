@@ -5,11 +5,17 @@
 //------------------------------------------------------------------------------
 {% macro class_definition(node) -%}
 {%- if class_needs_definition(node) %}
+//-----------------------------------------------------------------------------
 // {{get_class_friendly_name(node)}}
+//-----------------------------------------------------------------------------
+{%- if use_uvm_reg_enhanced %}
+class {{get_class_name(node)}} extends uvm_reg_enhanced;
+{%- else %}
 class {{get_class_name(node)}} extends uvm_reg;
+{%- endif %}
 {%- if use_uvm_factory %}
     `uvm_object_utils({{get_class_name(node)}})
-{%- endif %}
+{% endif %}
     {{child_insts(node)|indent}}
     {{function_new(node)|indent}}
 
@@ -50,8 +56,17 @@ virtual function void build();
     {%- else %}
     this.{{get_inst_name(field)}} = new("{{get_inst_name(field)}}");
     {%- endif %}
-    this.{{get_inst_name(field)}}.configure(this, {{field.width}}, {{field.lsb}}, "{{get_field_access(field)}}", {{field.is_volatile|int}}, {{"'h%x" % field.get_property('reset', default=0)}}, 1, 1, 0);
-    {%- endfor %}
+    this.{{get_inst_name(field)}}.configure( 
+                          .parent(this),
+                          .size({{field.width}}),
+                          .lsb_pos({{field.lsb}}),
+                          .access("{{get_field_access(field)}}"),
+                          .volatile({{field.is_volatile|int}}),
+                          .reset({{field.width}}{{"'h%x" % field.get_property('reset',default=0)}}),
+                          .has_reset(1),
+                          .is_rand(1),
+                          .individually_accessible(0));
+    {% endfor %}
 endfunction : build
 {%- endmacro %}
 
@@ -79,10 +94,12 @@ this.{{get_inst_name(node)}} = {{get_class_name(node)}}::type_id::create("{{get_
 this.{{get_inst_name(node)}} = new("{{get_inst_name(node)}}");
 {%- endif %}
 this.{{get_inst_name(node)}}.configure(this);
+{%- if node.get_property('hdl_path') %}
 {{add_hdl_path_slices(node, get_inst_name(node))|trim}}
-this.{{get_inst_name(node)}}.build();
-this.default_map.add_reg(this.{{get_inst_name(node)}}, {{"'h%x" % node.raw_address_offset}});
 {%- endif %}
+this.{{get_inst_name(node)}}.build();
+this.default_map.add_reg(.rg(this.{{get_inst_name(node)}}), .offset({{get_address_width(node)}}{{"'h%x"%node.raw_address_offset}}), .rights("{{get_reg_access(node)}}"));
+{% endif %}
 {%- endmacro %}
 
 //------------------------------------------------------------------------------
