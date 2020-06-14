@@ -61,6 +61,7 @@ virtual function void build();
     {%- else %}
     this.{{get_inst_name(field)}} = new("{{get_inst_name(field)}}");
     {%- endif %}
+    {%- if is_field_reserved(field) == False %}
     this.{{get_inst_name(field)}}.configure( 
                           .parent(this),
                           .size({{field.width}}),
@@ -71,6 +72,8 @@ virtual function void build();
                           .has_reset(1),
                           .is_rand(1),
                           .individually_accessible(0));
+    {%- else -%}
+    {% endif %}
     {% endfor %}
 endfunction : build
 {%- endmacro %}
