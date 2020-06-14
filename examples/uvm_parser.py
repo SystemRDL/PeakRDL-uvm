@@ -28,7 +28,7 @@ exporter.export(root,
                 dest_uvm_fl, 
                 export_as_package=export_as_package_l, 
                 use_uvm_factory=True, 
-                use_uvm_reg_enhanced=True,
+                use_uvm_reg_enhanced=False,
                 use_uppercase_inst_name=True,
                 reuse_class_definitions=False)
 
