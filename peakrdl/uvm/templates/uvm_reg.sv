@@ -30,7 +30,7 @@ endclass : {{get_class_name(node)}}
 // Child instances
 //------------------------------------------------------------------------------
 {% macro child_insts(node) -%}
-{% for field in node.fields() -%}
+{% for field in node.fields()|reverse -%}
 {%- if is_field_reserved(field) %}
      uvm_reg_field {{get_inst_name(field)}};
 {%- else %}
@@ -55,7 +55,7 @@ endfunction : new
 //------------------------------------------------------------------------------
 {% macro function_build(node) -%}
 virtual function void build();
-    {%- for field in node.fields() %}
+    {%- for field in node.fields()|reverse %}
     {%- if use_uvm_factory %}
     this.{{get_inst_name(field)}} = uvm_reg_field::type_id::create("{{get_inst_name(field)}}");
     {%- else %}
@@ -122,7 +122,7 @@ this.default_map.add_reg(.rg(this.{{get_inst_name(node)}}), .offset({{get_addres
 {{inst_ref}}.add_hdl_path_slice("{{node.get_property('hdl_path_gate')}}", -1, -1, 0, "GATE");
 {%- endif -%}
 
-{%- for field in node.fields() %}
+{%- for field in node.fields()|reverse %}
 {%- if field.get_property('hdl_path_slice') is none -%}
 {%- elif field.get_property('hdl_path_slice')|length == 1 %}
 {{inst_ref}}.add_hdl_path_slice("{{field.get_property('hdl_path_slice')[0]}}", {{field.lsb}}, {{field.width}});
@@ -137,7 +137,7 @@ this.default_map.add_reg(.rg(this.{{get_inst_name(node)}}), .offset({{get_addres
 {%- endif %}
 {%- endfor -%}
 
-{%- for field in node.fields() %}
+{%- for field in node.fields()|reverse %}
 {%- if field.get_property('hdl_path_gate_slice') is none -%}
 {%- elif field.get_property('hdl_path_gate_slice')|length == 1 %}
 {{inst_ref}}.add_hdl_path_slice("{{field.get_property('hdl_path_gate_slice')[0]}}", {{field.lsb}}, {{field.width}}, 0, "GATE");
