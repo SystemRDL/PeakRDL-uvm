@@ -13,7 +13,7 @@ Install from [PyPi](https://pypi.org/project/peakrdl-uvm) using pip:
 mkdir path_to_folder  
 cd path_to_folder  
 git clone https://github.com/muneebullashariff/PeakRDL-uvm.git  
-cd to systemrdl-compiler  
+cd to PeakRDL-uvm 
 pip install -e .  
 
 Advantages of this approach are:  
