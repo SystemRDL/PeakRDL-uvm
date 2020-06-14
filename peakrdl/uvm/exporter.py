@@ -70,6 +70,10 @@ class UVMExporter:
 
         self.reuse_class_definitions = True
 
+        # Used for making the instance name(s) in uppercase or lowercase
+        self.use_uppercase_inst_name = False
+
+
 
     def export(self, node: Node, path: str, **kwargs):
         """
@@ -80,13 +84,16 @@ class UVMExporter:
         node: systemrdl.Node
             Top-level node to export. Can be the top-level `RootNode` or any
             internal `AddrmapNode`.
+
         path: str
             Output file.
+
         export_as_package: bool
             If True (Default), UVM register model is exported as a SystemVerilog
             package. Package name is based on the output file name.
 
             If False, register model is exported as an includable header.
+
         reuse_class_definitions: bool
             If True (Default), exporter attempts to re-use class definitions
             where possible. Class names are based on the lexical scope of the
@@ -94,16 +101,31 @@ class UVMExporter:
 
             If False, class definitions are not reused. Class names are based on
             the instance's hierarchical path.
+
         use_uvm_factory: bool
             If True, class definitions and class instances are created using the
             UVM factory.
 
             If False (Default), UVM factory is disabled. Classes are created
             directly via new() constructors.
+
+        use_uvm_reg_enhanced: bool
+            If True, the register class definitions will be extended from uvm_reg_enhanced class
+            which has additional functionalities, when compared to UVM library uvm_reg class
+
+            If False (Default), the register class definitions will be extended from 
+            UVM library uvm_reg class
+
+        use_uppercase_inst_name: bool
+            If True, all the instance names will be in uppercase
+
+            if False (Default), all the instance names will be in lowercase
         """
         export_as_package = kwargs.pop("export_as_package", True)
-        use_uvm_factory = kwargs.pop("use_uvm_factory", False)
         self.reuse_class_definitions = kwargs.pop("reuse_class_definitions", True)
+        use_uvm_factory = kwargs.pop("use_uvm_factory", False)
+        use_uvm_reg_enhanced = kwargs.pop("use_uvm_reg_enhanced", False)
+        self.use_uppercase_inst_name = kwargs.pop("use_uppercase_inst_name", False)
 
         # Check for stray kwargs
         if kwargs:
@@ -138,6 +160,7 @@ class UVMExporter:
             'roundup_to': self._roundup_to,
             'roundup_pow2': self._roundup_pow2,
             'use_uvm_factory': use_uvm_factory,
+            'use_uvm_reg_enhanced': use_uvm_reg_enhanced
         }
 
         context.update(self.user_template_context)
@@ -223,7 +246,11 @@ class UVMExporter:
         """
         Returns the class instance name
         """
-        return node.inst_name
+
+        if self.use_uppercase_inst_name:
+            return node.inst_name.upper()
+        else:
+            return node.inst_name
 
 
     def _class_needs_definition(self, node: Node) -> bool:
