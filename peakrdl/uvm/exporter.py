@@ -250,7 +250,7 @@ class UVMExporter:
         if self.use_uppercase_inst_name:
             return node.inst_name.upper()
         else:
-            return node.inst_name
+            return node.inst_name.lower()
 
 
     def _class_needs_definition(self, node: Node) -> bool:
