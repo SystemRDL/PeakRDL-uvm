@@ -85,3 +85,12 @@ Perform the export!
       UVM factory.
     * If False (Default), UVM factory is disabled. Classes are created
       directly via new() constructors.
+* `use_uvm_reg_enhanced`
+    * If True, the register class definitions will be extended from 
+      uvm_reg_enhanced class which has additional functionalities, 
+      when compared to UVM library uvm_reg class
+    * If False (Default), the register class definitions will be extended from 
+      UVM library uvm_reg class
+* `use_uppercase_inst_name`
+    * If True, all the instance names will be in uppercase
+    * If False (Default), all the instance names will be in lowercase
