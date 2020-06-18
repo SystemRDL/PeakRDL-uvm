@@ -271,7 +271,7 @@ class UVMExporter:
         """
 
         # Check if the field is reserved type 
-        is_reserved = re.search("reserved",field.inst_name)
+        is_reserved = re.search("reserved",field.inst_name, re.IGNORECASE)
 
         if is_reserved:
             return True
