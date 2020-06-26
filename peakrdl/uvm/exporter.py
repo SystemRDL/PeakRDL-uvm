@@ -404,49 +404,81 @@ class UVMExporter:
         else:
             return "RW"
 
-    def _get_reg_access(self, reg: RegNode) -> str:
+    def _get_reg_access(self, node: RegNode) -> str:
         """
         Get register's UVM access for the map - string
         """
 
-        regaccess = reg.get_property("regaccess_p")
+        # Default value
+        regaccess = "RW";
 
-        if regaccess:
+        # Check if the udp is defined
+        is_defined = self.check_udp("regaccess_p", node)
+        
+        if not is_defined:
             return regaccess
-        else:
-            return "RW"
+   
+        # Get the upd value 
+        regaccess = node.get_property("regaccess_p", default=regaccess)
+
+        return regaccess
 
     def _get_address_width(self, node: Node) -> str:
         """
         Returns the address width for the register access
         """
 
+        # Default value
+        address_width = 32;
+
         amap = node.owning_addrmap
-        address_width = amap.get_property("address_width_p");
+
+        # Check if the udp is defined
+        is_defined = self.check_udp("address_width_p", node)
+        
+        if not is_defined:
+            return address_width
+   
+        # Get the upd value 
+        address_width = amap.get_property("address_width_p", default=address_width);
     
-        if address_width:
-            # Convert it to decimal value
-            address_width = int(address_width)
-        else: 
-            # Default value
-            address_width = 32;
-    
-        return address_width 
+        return (int(address_width)) 
+
+    def check_udp(self, prop_name: str, node: Node) -> bool:
+        """
+        Checks if the property name is a udp
+        """
+
+        prop_ups = node.list_properties(include_native=False, include_udp=True)
+
+        if prop_name in prop_ups:
+            return True
+        else:
+            return False
 
     def _get_base_address(self, node: Node) -> str:
         """
         Returns the base address for the register block 
         """
 
-        amap = node.owning_addrmap
-        base_address = amap.get_property("base_address_p");
+        # Default value 
+        base_address = 0
 
-        if base_address:
-            # Convert the value into hexadecimal 
-            # excluding 0x - just the value
-            base_address = hex(base_address)[2:]
-        else:
-            base_address = 0;
+        # Get the property value
+        amap = node.owning_addrmap
+
+        # Check if the udp is defined
+        is_defined = self.check_udp("base_address_p", node)
+        
+        if not is_defined:
+            return (self.format_address(base_address)) 
+
+        # Get the value
+        base_address = amap.get_property("base_address_p", default=base_address);
+
+        # Convert the value into hexadecimal 
+        # excluding 0x - just the value
+        base_address = hex(base_address)[2:]
 
         return base_address 
 
