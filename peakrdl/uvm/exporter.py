@@ -283,15 +283,20 @@ class UVMExporter:
         Returns the address map name
         """
 
+        # Default value
+        amap_name = "reg_map";
+
+        # Check if the udp is defined
+        is_defined = self.check_udp("map_name_p", node)
+        
+        if not is_defined:
+            return amap_name
+   
+        # Get the upd value 
         amap = node.owning_addrmap
-        amap_name = amap.get_property("map_name_p");
+        amap_name = amap.get_property("map_name_p", default=amap_name);
 
-        if amap_name:
-            amap_name = amap_name.upper()
-        else:
-            amap_name = "reg_map"
-
-        return amap_name
+        return amap_name.upper()
 
     def _class_needs_definition(self, node: Node) -> bool:
         """
