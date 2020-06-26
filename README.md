@@ -9,6 +9,19 @@ Install from [PyPi](https://pypi.org/project/peakrdl-uvm) using pip:
 
     python3 -m pip install peakrdl-uvm
 
+## Install from Github using pip
+mkdir path_to_folder  
+cd path_to_folder  
+git clone https://github.com/muneebullashariff/PeakRDL-uvm.git  
+cd to PeakRDL-uvm 
+pip install -e .  
+
+Advantages of this approach are:  
+1 - You can install package in your home projects directory.  
+2 - Package includes .git dir, so it's regular Git repository. You can push to your fork right away.  
+
+## Uninstall   
+pip uninstall PeakRDL-uvm  
 --------------------------------------------------------------------------------
 
 ## Exporter Usage
@@ -72,3 +85,12 @@ Perform the export!
       UVM factory.
     * If False (Default), UVM factory is disabled. Classes are created
       directly via new() constructors.
+* `use_uvm_reg_enhanced`
+    * If True, the register class definitions will be extended from 
+      uvm_reg_enhanced class which has additional functionalities, 
+      when compared to UVM library uvm_reg class
+    * If False (Default), the register class definitions will be extended from 
+      UVM library uvm_reg class
+* `use_uppercase_inst_name`
+    * If True, all the instance names will be in uppercase
+    * If False (Default), all the instance names will be in lowercase
