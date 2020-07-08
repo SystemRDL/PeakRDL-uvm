@@ -50,6 +50,8 @@ virtual function void build();
                                   .base_addr({{get_address_width(node)}}'h{{get_base_address(node)}}), 
                                   .n_bytes({{get_bus_width(node)}}), 
                                   .endian({{get_endianness(node)}}));
+
+    this.add_hdl_path("{{node.get_property('hdl_path')}}");
     {% for child in node.children() -%}
         {%- if isinstance(child, RegNode) -%}
             {{uvm_reg.build_instance(child)|indent}}
