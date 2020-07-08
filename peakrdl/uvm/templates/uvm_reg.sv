@@ -102,9 +102,7 @@ this.{{get_inst_name(node)}} = {{get_class_name(node)}}::type_id::create("{{get_
 this.{{get_inst_name(node)}} = new("{{get_inst_name(node)}}");
 {%- endif %}
 this.{{get_inst_name(node)}}.configure(this);
-{%- if node.get_property('hdl_path') %}
 {{add_hdl_path_slices(node, get_inst_name(node))|trim}}
-{%- endif %}
 this.{{get_inst_name(node)}}.build();
 this.default_map.add_reg(.rg(this.{{get_inst_name(node)}}), .offset({{get_address_width(node)}}{{"'h%x"%node.raw_address_offset}}), .rights("{{get_reg_access(node)}}"));
 {% endif %}
@@ -112,26 +110,27 @@ this.default_map.add_reg(.rg(this.{{get_inst_name(node)}}), .offset({{get_addres
 
 //------------------------------------------------------------------------------
 // Load HDL path slices for this reg instance
+//{% macro add_hdl_path_slices_old(node, inst_ref) -%}
+//{%- if node.get_property('hdl_path') %}
+//this.{{inst_ref}}.add_hdl_path_slice("{{node.get_property('hdl_path')}}", -1, -1);
+//{%- endif -%}
+//
+//{%- if node.get_property('hdl_path_gate') %}
+//this.{{inst_ref}}.add_hdl_path_slice("{{node.get_property('hdl_path_gate')}}", -1, -1, 0, "GATE");
+//{%- endif -%}
+//{%- endmacro %}
 //------------------------------------------------------------------------------
 {% macro add_hdl_path_slices(node, inst_ref) -%}
-{%- if node.get_property('hdl_path') %}
-{{inst_ref}}.add_hdl_path_slice("{{node.get_property('hdl_path')}}", -1, -1);
-{%- endif -%}
-
-{%- if node.get_property('hdl_path_gate') %}
-{{inst_ref}}.add_hdl_path_slice("{{node.get_property('hdl_path_gate')}}", -1, -1, 0, "GATE");
-{%- endif -%}
-
 {%- for field in node.fields()|reverse %}
 {%- if field.get_property('hdl_path_slice') is none -%}
 {%- elif field.get_property('hdl_path_slice')|length == 1 %}
-{{inst_ref}}.add_hdl_path_slice("{{field.get_property('hdl_path_slice')[0]}}", {{field.lsb}}, {{field.width}});
+this.{{inst_ref}}.add_hdl_path_slice(.name("{{field.get_property('hdl_path_slice')[0]}}"), .offset({{field.lsb}}), .size({{field.width}}));
 {%- elif field.get_property('hdl_path_slice')|length == field.width %}
 {%- for slice in field.get_property('hdl_path_slice') %}
 {%- if field.msb > field.lsb %}
-{{inst_ref}}.add_hdl_path_slice("{{slice}}", {{field.msb - loop.index0}}, 1);
+this.{{inst_ref}}.add_hdl_path_slice("{{slice}}", {{field.msb - loop.index0}}, 1);
 {%- else %}
-{{inst_ref}}.add_hdl_path_slice("{{slice}}", {{field.msb + loop.index0}}, 1);
+this.{{inst_ref}}.add_hdl_path_slice("{{slice}}", {{field.msb + loop.index0}}, 1);
 {%- endif %}
 {%- endfor %}
 {%- endif %}
