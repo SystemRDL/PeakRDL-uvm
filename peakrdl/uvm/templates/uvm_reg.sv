@@ -18,7 +18,15 @@ class {{get_class_name(node)}} extends uvm_reg;
 {%- endif %}
     {{child_insts(node)|indent}}
 
+{%- if has_coverage %}
+    {{coverage_insts(node)|indent}}
+{%- endif %}
+
     {{function_new(node)|indent}}
+
+{%- if has_coverage %}
+    {{coverage_function_insts(node)|indent}}
+{%- endif %}
 
     {{function_build(node)|indent}}
 endclass : {{get_class_name(node)}}
@@ -39,13 +47,65 @@ rand uvm_reg_field {{get_inst_name(field)}};
 {%- endfor %}
 {%- endmacro %}
 
+//------------------------------------------------------------------------------
+// Coverage instances
+//------------------------------------------------------------------------------
+{% macro coverage_insts(node) %}
+// Covergroup
+covergroup cg_vals;
+{%- for field in node.fields()|reverse -%}
+{%- if not is_field_reserved(field) %}
+    {{get_inst_name(field)}} : coverpoint {{get_inst_name(field)}}.value[{{get_field_cov_range(field)}}];
+{%- endif -%}
+{%- endfor %}
+endgroup
+{%- endmacro %}
+
+//------------------------------------------------------------------------------
+// Coverage function instances
+//------------------------------------------------------------------------------
+{% macro coverage_function_insts(node) %}
+// Function: sample_values
+virtual function void sample_values();
+    super.sample_values();
+    if (get_coverage(UVM_CVR_FIELD_VALS))
+       cg_vals.sample();
+endfunction
+
+// Function: sample
+// This method is automatically invoked by the register abstraction class
+// whenever it is read or written with the specified ~data~
+// via the specified address ~map~
+protected virtual function void sample(uvm_reg_data_t data,
+                                       uvm_reg_data_t byte_en,
+                                       bit is_read,
+                                       uvm_reg_map map);
+    super.sample(data,byte_en,is_read,map);   
+    
+    foreach (m_fields[i])
+       m_fields[i].value = ((data >> m_fields[i].get_lsb_pos()) &
+                            ((1 << m_fields[i].get_n_bits()) - 1));
+ 
+    sample_values();
+endfunction
+{%- endmacro %}
 
 //------------------------------------------------------------------------------
 // new() function
 //------------------------------------------------------------------------------
 {% macro function_new(node) -%}
+// Function: new
 function new(string name = "{{get_class_name(node)}}");
+  {%- if has_coverage %}
+    super.new(name, {{node.get_property('regwidth')}}, build_coverage(UVM_CVR_FIELD_VALS));
+    add_coverage(build_coverage(UVM_CVR_FIELD_VALS));
+    if(has_coverage(UVM_CVR_FIELD_VALS)) begin
+       cg_vals = new();
+       cg_vals.set_inst_name(name);
+    end  
+  {%- else %}
     super.new(name, {{node.get_property('regwidth')}}, UVM_NO_COVERAGE);
+  {%- endif %}
 endfunction : new
 {%- endmacro %}
 
@@ -54,6 +114,7 @@ endfunction : new
 // build() function
 //------------------------------------------------------------------------------
 {% macro function_build(node) -%}
+// Function: build
 virtual function void build();
     {%- for field in node.fields()|reverse %}
     {%- if use_uvm_factory %}

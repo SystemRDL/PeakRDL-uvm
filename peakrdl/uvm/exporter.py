@@ -115,6 +115,11 @@ class UVMExporter:
             If False (Default), UVM factory is disabled. Classes are created
             directly via new() constructors.
 
+        has_coverage: bool
+            If True (Default), then the coverage collateral is added
+
+            If false, then no coverage collateral is added
+
         use_uvm_reg_enhanced: bool
             If True, the register class definitions will be extended from uvm_reg_enhanced class
             which has additional functionalities, when compared to UVM library uvm_reg class
@@ -130,6 +135,7 @@ class UVMExporter:
         export_as_package = kwargs.pop("export_as_package", True)
         self.reuse_class_definitions = kwargs.pop("reuse_class_definitions", True)
         use_uvm_factory = kwargs.pop("use_uvm_factory", False)
+        has_coverage = kwargs.pop("has_coverage", True)
         use_uvm_reg_enhanced = kwargs.pop("use_uvm_reg_enhanced", False)
         self.use_uppercase_inst_name = kwargs.pop("use_uppercase_inst_name", False)
 
@@ -162,6 +168,7 @@ class UVMExporter:
             'get_inst_map_name': self._get_inst_map_name,
             'get_field_access': self._get_field_access,
             'get_reg_access': self._get_reg_access,
+            'is_reg_access_ro': self._is_reg_access_ro,
             'get_address_width': self._get_address_width,
             'get_base_address': self._get_base_address,
             'get_array_address_offset_expr': self._get_array_address_offset_expr,
@@ -171,6 +178,8 @@ class UVMExporter:
             'roundup_to': self._roundup_to,
             'roundup_pow2': self._roundup_pow2,
             'use_uvm_factory': use_uvm_factory,
+            'has_coverage': has_coverage,
+            'get_field_cov_range': self._get_field_cov_range,
             'use_uvm_reg_enhanced': use_uvm_reg_enhanced,
             'get_today_date': self.today_date,
             'get_current_time': self.current_time
@@ -325,6 +334,17 @@ class UVMExporter:
         self.namespace_db[type_name] = node.inst.original_def
         return True
 
+    def _get_field_cov_range(self, field: FieldNode) -> str:
+        """
+        Get the range of the field value for coverpoint 
+        """
+
+        if field.width>1:
+            s = "%s:%s" %((field.width-1),0)
+        else:
+            s = '0'
+
+        return s 
 
     def _get_field_access(self, field: FieldNode) -> str:
         """
@@ -408,6 +428,16 @@ class UVMExporter:
             return "R"
         else:
             return "RW"
+
+    def _is_reg_access_ro(self, node: RegNode) -> bool:
+        """
+        Returns true if the reg access is read-only
+        """
+
+        if self._get_reg_access(node) == "RO":
+            return True
+        else:
+            return False
 
     def _get_reg_access(self, node: RegNode) -> str:
         """
