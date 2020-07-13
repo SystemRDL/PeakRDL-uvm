@@ -2,6 +2,7 @@ import os
 import re
 import datetime
 import time
+import sys
 
 import jinja2 as jj
 from systemrdl.node import RootNode, Node, RegNode, AddrmapNode, RegfileNode
@@ -120,6 +121,11 @@ class UVMExporter:
 
             If false, then no coverage collateral is added
 
+        has_hdl_path: bool
+            If True, then the input rdl file must define the hdl_path for each field
+
+            If False (Default), then the hdl_path is not mandatory from user
+
         use_uvm_reg_enhanced: bool
             If True, the register class definitions will be extended from uvm_reg_enhanced class
             which has additional functionalities, when compared to UVM library uvm_reg class
@@ -136,6 +142,7 @@ class UVMExporter:
         self.reuse_class_definitions = kwargs.pop("reuse_class_definitions", True)
         use_uvm_factory = kwargs.pop("use_uvm_factory", False)
         has_coverage = kwargs.pop("has_coverage", True)
+        has_hdl_path = kwargs.pop("has_hdl_path", False)
         use_uvm_reg_enhanced = kwargs.pop("use_uvm_reg_enhanced", False)
         self.use_uppercase_inst_name = kwargs.pop("use_uppercase_inst_name", False)
 
@@ -170,6 +177,7 @@ class UVMExporter:
             'get_reg_access': self._get_reg_access,
             'is_reg_access_ro': self._is_reg_access_ro,
             'get_address_width': self._get_address_width,
+            'get_field_hdl_path_slice': self._get_field_hdl_path_slice, 
             'get_base_address': self._get_base_address,
             'get_array_address_offset_expr': self._get_array_address_offset_expr,
             'get_endianness': self._get_endianness,
@@ -179,6 +187,7 @@ class UVMExporter:
             'roundup_pow2': self._roundup_pow2,
             'use_uvm_factory': use_uvm_factory,
             'has_coverage': has_coverage,
+            'has_hdl_path': has_hdl_path,
             'get_field_cov_range': self._get_field_cov_range,
             'use_uvm_reg_enhanced': use_uvm_reg_enhanced,
             'get_today_date': self.today_date,
@@ -457,7 +466,7 @@ class UVMExporter:
         regaccess = node.get_property("regaccess_p", default=regaccess)
 
         return regaccess
-
+        
     def _get_address_width(self, node: Node) -> str:
         """
         Returns the address width for the register access
@@ -478,6 +487,91 @@ class UVMExporter:
         address_width = amap.get_property("address_width_p", default=address_width);
     
         return (int(address_width)) 
+
+    def _get_field_hdl_path_slice(self, field: FieldNode) -> str:
+        """
+        Checks for the hdl path correctness and returns the value.
+        The expected value is based on the RTL generation. 
+        In this case, script rtl_c_parser.py
+        """
+        
+        # User input hdl_path
+        hdl_path_slice = field.get_property('hdl_path_slice')
+        if hdl_path_slice is None:
+            print("[ERROR] Please specify the hdl_path for the")
+            print(" Field '%s' in the Regsiter '%s'" %(field.inst_name, field.parent.inst_name.upper()) ) 
+            sys.exit(2)
+        else:
+            actual_hdl_path = field.get_property('hdl_path_slice')[0]
+
+        # Deriving expected hdl_path
+        expected_hdl_path = 'cfg_' + field.parent.inst_name.upper()
+        expected_hdl_path += '_' + field.inst_name.lower()
+
+        hw_access = self._get_field_hw_access(field)
+
+        if hw_access == "RO":
+            expected_hdl_path = expected_hdl_path;
+        elif hw_access == "WO":
+            expected_hdl_path += "_ip";
+        elif hw_access == "W1S" or hw_access == "RW1S":
+            expected_hdl_path += "_set";
+        elif hw_access == "W1C" or hw_access == "RW1C":
+            expected_hdl_path += "_clr";
+        else:
+            print("[ERROR] Unsupported hw_access type %s for the field '%s'" %(hw_access,field.inst_name))
+            sys.exit(2)
+
+        if actual_hdl_path != expected_hdl_path:
+            print("[ERROR] Please check the hdl_path for the field '%s'" %field.inst_name)
+            print("Actual   - %s" %actual_hdl_path)
+            print("Expected - %s" %expected_hdl_path)
+            sys.exit(2)
+
+        return actual_hdl_path
+    
+    def _get_field_hw_access(self, field: FieldNode) -> str:
+        """
+        Get field's HW access string
+        """
+        hw = field.get_property("hw")
+        hwset = field.get_property("hwset")
+        hwclr = field.get_property("hwclr")
+        
+        if hw == AccessType.rw:
+            if (hwset is False) and (hwclr is False):
+                return "RW"
+            elif hwset is True:
+                return "RW1S"
+            elif hwclr is True:
+                return "RW1C"
+            else:
+                fatal_error("Error - Not valid HW access code for RW type")
+
+        elif hw == AccessType.r:
+            if (hwset is False) and (hwclr is False):
+                return "RO"
+            elif hwset is True:
+                return "R1S"
+            elif hwclr is True:
+                return "R1C"
+            else:
+                fatal_error("Error - Not valid HW access code for R type")
+                sys.exit(2)
+
+        elif hw == AccessType.w:
+            if (hwset is False) and (hwclr is False):
+                return "WO"
+            elif hwset is True:
+                return "W1S"
+            elif hwclr is True:
+                return "W1C"
+            else:
+                fatal_error("Error - Not valid HW access code for W type %s" %(get_inst_name(field)))
+                sys.exit(2)
+
+        else: # na
+            return "NOACCESS"
 
     def check_udp(self, prop_name: str, node: Node) -> bool:
         """

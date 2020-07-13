@@ -163,7 +163,9 @@ this.{{get_inst_name(node)}} = {{get_class_name(node)}}::type_id::create("{{get_
 this.{{get_inst_name(node)}} = new("{{get_inst_name(node)}}");
 {%- endif %}
 this.{{get_inst_name(node)}}.configure(this);
+{% if has_hdl_path -%}
 {{add_hdl_path_slices(node, get_inst_name(node))|trim}}
+{%- endif %}
 this.{{get_inst_name(node)}}.build();
 this.default_map.add_reg(.rg(this.{{get_inst_name(node)}}), .offset({{get_address_width(node)}}{{"'h%x"%node.raw_address_offset}}), .rights("{{get_reg_access(node)}}"));
 {% endif %}
@@ -184,8 +186,11 @@ this.default_map.add_reg(.rg(this.{{get_inst_name(node)}}), .offset({{get_addres
 {% macro add_hdl_path_slices(node, inst_ref) -%}
 {%- for field in node.fields()|reverse %}
 {%- if field.get_property('hdl_path_slice') is none -%}
+{% if has_hdl_path and is_field_reserved(field) == False -%} 
+this.{{inst_ref}}.add_hdl_path_slice(.name("{{get_field_hdl_path_slice(field)}}"), .offset({{field.lsb}}), .size({{field.width}}));
+{%- endif %}
 {%- elif field.get_property('hdl_path_slice')|length == 1 %}
-this.{{inst_ref}}.add_hdl_path_slice(.name("{{field.get_property('hdl_path_slice')[0]}}"), .offset({{field.lsb}}), .size({{field.width}}));
+this.{{inst_ref}}.add_hdl_path_slice(.name("{{get_field_hdl_path_slice(field)}}"), .offset({{field.lsb}}), .size({{field.width}}));
 {%- elif field.get_property('hdl_path_slice')|length == field.width %}
 {%- for slice in field.get_property('hdl_path_slice') %}
 {%- if field.msb > field.lsb %}
@@ -195,7 +200,7 @@ this.{{inst_ref}}.add_hdl_path_slice("{{slice}}", {{field.msb + loop.index0}}, 1
 {%- endif %}
 {%- endfor %}
 {%- endif %}
-{%- endfor -%}
+{%- endfor %}
 
 {%- for field in node.fields()|reverse %}
 {%- if field.get_property('hdl_path_gate_slice') is none -%}
