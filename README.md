@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/SystemRDL/PeakRDL-uvm.svg?branch=master)](https://travis-ci.com/SystemRDL/PeakRDL-uvm)
+![.github/workflows/build.yml](https://github.com/SystemRDL/PeakRDL-uvm/workflows/.github/workflows/build.yml/badge.svg)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/peakrdl-uvm.svg)](https://pypi.org/project/peakrdl-uvm)
 
 # PeakRDL-uvm
