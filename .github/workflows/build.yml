@@ -33,11 +33,11 @@ jobs:
       - name: Install
         run: |
           python setup.py install
-          python generate_testcase_data.py basic testcases/basic.rdl
 
       - name: Test
         run: |
           cd test
+          python generate_testcase_data.py basic testcases/basic.rdl
           pytest --cov=peakrdl
 
       - name: Coveralls
