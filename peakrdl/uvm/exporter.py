@@ -1,5 +1,6 @@
 import os
 import re
+from typing import Optional
 
 import jinja2 as jj
 from systemrdl.node import RootNode, Node, RegNode, AddrmapNode, RegfileNode
@@ -164,19 +165,46 @@ class UVMExporter:
         return s
 
 
+    def _get_class_name_new(self, node: Node) -> str:
+        """
+        Returns the class type name.
+        Shall be unique enough to prevent type name collisions
+        """
+        if self.reuse_class_definitions:
+            pass
+        else:
+            class_name = node.get_rel_path(
+                self.top.parent,
+                hier_separator="__", array_suffix="", empty_array_suffix=""
+            )
+
+        return class_name
+
+    def _get_type_path(self, node: Node, separator:str = "::") -> Optional[str]:
+        """
+        Returns the full hierarchical type path.
+        This is different from the scope path, as it includes uinquified type names
+        from Parameters, DPAs, etc.
+        Returns None if any segment in the path is unknown
+        """
+        if node == self.top:
+            return node.type_name
+
+        parent_path = self._get_type_path(node.parent, separator)
+        if (parent_path is None) or (node.type_name is None):
+            return None
+        return parent_path + separator + node.type_name
+
     def _get_class_name(self, node: Node) -> str:
         """
         Returns the class type name.
         Shall be unique enough to prevent type name collisions
         """
         if self.reuse_class_definitions:
-            scope_path = node.inst.get_scope_path(scope_separator="__")
+            type_path = self._get_type_path(node, "__")
 
-            if (scope_path is not None) and (node.type_name is not None):
-                if scope_path:
-                    class_name = scope_path + "__" + node.type_name
-                else:
-                    class_name = node.type_name
+            if type_path is not None:
+                class_name = type_path
             else:
                 # Unable to determine a reusable type name. Fall back to hierarchical path
                 class_name = node.get_rel_path(
@@ -200,19 +228,13 @@ class UVMExporter:
         a comment
         """
         if self.reuse_class_definitions:
-            scope_path = node.inst.get_scope_path()
+            type_path = self._get_type_path(node)
 
-            if (scope_path is not None) and (node.type_name is not None):
-                if scope_path:
-                    friendly_name = scope_path + "::" + node.type_name
-                else:
-                    friendly_name = node.type_name
+            if type_path is not None:
+                friendly_name = type_path
             else:
                 # Unable to determine a reusable type name. Fall back to hierarchical path
-                friendly_name = node.get_rel_path(
-                    self.top.parent,
-                    hier_separator="__", array_suffix="", empty_array_suffix=""
-                )
+                friendly_name = node.get_rel_path(self.top.parent)
         else:
             friendly_name = node.get_rel_path(self.top.parent)
 
