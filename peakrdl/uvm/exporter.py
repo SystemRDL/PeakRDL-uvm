@@ -6,6 +6,7 @@ import jinja2 as jj
 from systemrdl.node import RootNode, Node, RegNode, AddrmapNode, RegfileNode
 from systemrdl.node import FieldNode, MemNode, AddressableNode
 from systemrdl.rdltypes import AccessType, OnReadType, OnWriteType
+from systemrdl.component import Root
 from systemrdl import RDLWalker
 
 from .pre_export_listener import PreExportListener
@@ -180,20 +181,40 @@ class UVMExporter:
 
         return class_name
 
-    def _get_type_path(self, node: Node, separator:str = "::") -> Optional[str]:
+    def _get_resolved_scope_path(self, node: Node, separator:str = "::") -> Optional[str]:
         """
-        Returns the full hierarchical type path.
-        This is different from the scope path, as it includes uinquified type names
-        from Parameters, DPAs, etc.
+        Returns the scope path, but with resolved type names
         Returns None if any segment in the path is unknown
         """
-        if node == self.top:
+
+        if node.inst.parent_scope is None:
+            # Scope information is not known
+            return None
+
+        if isinstance(node.inst.parent_scope, Root):
+            # Declaration of this was in the root scope
             return node.type_name
 
-        parent_path = self._get_type_path(node.parent, separator)
-        if (parent_path is None) or (node.type_name is None):
-            return None
-        return parent_path + separator + node.type_name
+        # Due to namespace nesting properties, it is guaranteed that the parent
+        # scope definition is also going to be one of the node's ancestors.
+        # Seek up and find it
+        current_parent_node = node.parent
+
+        while current_parent_node:
+            if current_parent_node.inst.original_def is None:
+                # Original def reference is unknown
+                return None
+            if current_parent_node.inst.original_def is node.inst.parent_scope:
+                # Parent node's definition matches the scope we're looking for
+                parent_scope_path = self._get_resolved_scope_path(current_parent_node, separator)
+                if (parent_scope_path is None) or (node.type_name is None):
+                    return None
+                return parent_scope_path + separator + node.type_name
+
+            current_parent_node = current_parent_node.parent
+
+        # Failed to find the path
+        return None
 
     def _get_class_name(self, node: Node) -> str:
         """
@@ -201,10 +222,10 @@ class UVMExporter:
         Shall be unique enough to prevent type name collisions
         """
         if self.reuse_class_definitions:
-            type_path = self._get_type_path(node, "__")
+            scope_path = self._get_resolved_scope_path(node, "__")
 
-            if type_path is not None:
-                class_name = type_path
+            if scope_path is not None:
+                class_name = scope_path
             else:
                 # Unable to determine a reusable type name. Fall back to hierarchical path
                 class_name = node.get_rel_path(
@@ -228,10 +249,10 @@ class UVMExporter:
         a comment
         """
         if self.reuse_class_definitions:
-            type_path = self._get_type_path(node)
+            scope_path = self._get_resolved_scope_path(node)
 
-            if type_path is not None:
-                friendly_name = type_path
+            if scope_path is not None:
+                friendly_name = scope_path
             else:
                 # Unable to determine a reusable type name. Fall back to hierarchical path
                 friendly_name = node.get_rel_path(self.top.parent)
