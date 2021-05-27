@@ -1,4 +1,4 @@
-![.github/workflows/build.yml](https://github.com/SystemRDL/PeakRDL-uvm/workflows/.github/workflows/build.yml/badge.svg)
+[![build](https://github.com/SystemRDL/PeakRDL-uvm/workflows/build/badge.svg)](https://github.com/SystemRDL/PeakRDL-uvm/actions?query=workflow%3Abuild+branch%3Amaster)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/peakrdl-uvm.svg)](https://pypi.org/project/peakrdl-uvm)
 
 # PeakRDL-uvm

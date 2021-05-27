@@ -116,6 +116,12 @@ class UVMExporter:
             node = node.top
         self.top = node
 
+        if isinstance(node, AddrmapNode) and node.get_property('bridge'):
+            node.env.msg.warning(
+                "UVM RAL generator does not have proper support for bridge addmaps yet. The 'bridge' property will be ignored.",
+                node.inst.property_src_ref.get('bridge', node.inst.inst_src_ref)
+            )
+
         # First, traverse the model and collect some information
         self.bus_width_db = {}
         RDLWalker().walk(self.top, PreExportListener(self))
