@@ -25,7 +25,7 @@ class UVMExporter:
             Additional context variables to load into the template namespace.
         """
         user_template_dir = kwargs.pop("user_template_dir", None)
-        self.user_template_context = kwargs.pop("user_template_context", dict())
+        self.user_template_context = kwargs.pop("user_template_context", {})
 
         # Check for stray kwargs
         if kwargs:
