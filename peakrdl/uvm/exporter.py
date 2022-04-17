@@ -382,7 +382,7 @@ class UVMExporter:
     def _get_mem_access(self, mem: MemNode) -> str:
         sw = mem.get_property("sw")
         if sw == AccessType.r:
-            return "R"
+            return "RO"
         else:
             return "RW"
 
