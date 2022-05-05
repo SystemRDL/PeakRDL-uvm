@@ -23,6 +23,10 @@ addrmap basic {
 
         r3.f1->sw=w;
         r3.f1->reset=200;
+
+        reg {
+            field {sw=rw; hw=r;} f;
+        } r4 @ 0xc;
     } foo @ 0x0;
 
     regfile bar_t {
@@ -34,7 +38,7 @@ addrmap basic {
         hdl_path = "bar";
         hdl_path_gate = "bar_gate";
     };
-    
+
     bar_t bar[4][3] @ 0x1000 += 0x100;
     bar_t bar2 @ 0x8000;
 
