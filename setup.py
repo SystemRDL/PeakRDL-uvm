@@ -5,7 +5,7 @@ with open("README.md", "r", encoding='utf-8') as fh:
     long_description = fh.read()
 
 
-with open(os.path.join("peakrdl/uvm", "__about__.py"), encoding='utf-8') as f:
+with open(os.path.join("src/peakrdl_uvm", "__about__.py"), encoding='utf-8') as f:
     v_dict = {}
     exec(f.read(), v_dict)
     version = v_dict['__version__']
@@ -18,7 +18,11 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/SystemRDL/PeakRDL-uvm",
-    packages=['peakrdl.uvm'],
+    package_dir={'': 'src'},
+    packages=[
+        'peakrdl_uvm',
+        'peakrdl.uvm', # backwards compatibility shim
+    ],
     include_package_data=True,
     install_requires=[
         "systemrdl-compiler>=1.12.0",

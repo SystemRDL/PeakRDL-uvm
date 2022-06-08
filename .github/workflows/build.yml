@@ -59,7 +59,7 @@ jobs:
 
       - name: Run Lint
         run: |
-          pylint --rcfile test/pylint.rc peakrdl
+          pylint --rcfile test/pylint.rc peakrdl_uvm
 
 #-------------------------------------------------------------------------------
   build_sdist:

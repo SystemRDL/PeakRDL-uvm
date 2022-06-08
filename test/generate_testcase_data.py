@@ -6,7 +6,7 @@ import os
 import jinja2 as jj
 
 from systemrdl import RDLCompiler, AddrmapNode, RegfileNode, MemNode, RegNode, FieldNode
-from peakrdl.uvm import UVMExporter
+from peakrdl_uvm import UVMExporter
 
 #-------------------------------------------------------------------------------
 testcase_name = sys.argv[1]

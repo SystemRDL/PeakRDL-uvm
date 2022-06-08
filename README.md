@@ -18,7 +18,7 @@ to the exporter.
 ```python
 import sys
 from systemrdl import RDLCompiler, RDLCompileError
-from peakrdl.uvm import UVMExporter
+from peakrdl_uvm import UVMExporter
 
 rdlc = RDLCompiler()
 

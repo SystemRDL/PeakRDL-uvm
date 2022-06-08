@@ -40,6 +40,4 @@ fi
 
 
 # Run lint
-cd $this_dir/..
-$pylint --rcfile $this_dir/pylint.rc peakrdl | tee $this_dir/lint.rpt
-cd $this_dir
+$pylint --rcfile $this_dir/pylint.rc ../src/peakrdl_uvm | tee $this_dir/lint.rpt

@@ -1,2 +1,2 @@
-recursive-include peakrdl/uvm/templates *
+recursive-include src/peakrdl_uvm/templates *
 recursive-exclude test *

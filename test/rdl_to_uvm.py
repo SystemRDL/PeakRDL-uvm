@@ -4,7 +4,7 @@ import sys
 import os
 
 from systemrdl import RDLCompiler
-from peakrdl.uvm import UVMExporter
+from peakrdl_uvm import UVMExporter
 
 
 rdl_file = sys.argv[1]
