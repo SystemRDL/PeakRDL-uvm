@@ -28,6 +28,11 @@ setuptools.setup(
         "systemrdl-compiler>=1.12.0",
         "jinja2",
     ],
+    entry_points = {
+        "peakrdl.exporters": [
+            'uvm = peakrdl_uvm.__peakrdl__:Exporter'
+        ]
+    },
     classifiers=(
         "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python",
