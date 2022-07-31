@@ -2,7 +2,9 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/peakrdl-uvm.svg)](https://pypi.org/project/peakrdl-uvm)
 
 # PeakRDL-uvm
-Generate UVM register model from compiled SystemRDL input
+Generate UVM register model from compiled SystemRDL input.
+
+For the command line tool, see the [PeakRDL project](https://peakrdl.readthedocs.io).
 
 ## Installing
 Install from [PyPi](https://pypi.org/project/peakrdl-uvm) using pip:
