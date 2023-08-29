@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from peakrdl.plugins.exporter import ExporterSubcommandPlugin #pylint: disable=import-error
+from peakrdl.config import schema #pylint: disable=import-error
 
 from .exporter import UVMExporter
 
@@ -11,7 +12,13 @@ if TYPE_CHECKING:
 
 class Exporter(ExporterSubcommandPlugin):
     short_desc = "Generate a UVM register model"
+    
+    cfg_schema = {
+        "user_template_dir": schema.DirectoryPath(),
+        "user_template_context": schema.DirectoryPath(),
+    }
 
+    
     def add_exporter_arguments(self, arg_group: 'argparse.ArgumentParser') -> None:
         arg_group.add_argument(
             "--file-type",
@@ -43,7 +50,10 @@ class Exporter(ExporterSubcommandPlugin):
 
 
     def do_export(self, top_node: 'AddrmapNode', options: 'argparse.Namespace') -> None:
-        x = UVMExporter()
+        x = UVMExporter(
+            user_template_dir=self.cfg['user_template_dir'],
+            user_template_context=self.cfg['user_template_context']
+        )
         x.export(
             top_node,
             options.output,
