@@ -15,7 +15,7 @@ class Exporter(ExporterSubcommandPlugin):
     
     cfg_schema = {
         "user_template_dir": schema.DirectoryPath(),
-        "user_template_context": schema.DirectoryPath(),
+        "user_template_context": schema.FixedMapping(),
     }
 
     
