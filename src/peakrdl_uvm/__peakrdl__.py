@@ -12,13 +12,13 @@ if TYPE_CHECKING:
 
 class Exporter(ExporterSubcommandPlugin):
     short_desc = "Generate a UVM register model"
-    
+
     cfg_schema = {
         "user_template_dir": schema.DirectoryPath(),
-        "user_template_context": schema.FixedMapping(),
+        "user_template_context": schema.FixedMapping(schema.String()),
     }
 
-    
+
     def add_exporter_arguments(self, arg_group: 'argparse.ArgumentParser') -> None:
         arg_group.add_argument(
             "--file-type",
