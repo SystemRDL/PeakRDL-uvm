@@ -1,12 +1,10 @@
 import os
 import re
-from typing import Optional
 
 import jinja2 as jj
 from systemrdl.node import RootNode, Node, RegNode, AddrmapNode, RegfileNode
 from systemrdl.node import FieldNode, MemNode, AddressableNode
 from systemrdl.rdltypes import AccessType, OnReadType, OnWriteType
-from systemrdl.component import Root
 from systemrdl import RDLWalker
 
 from .pre_export_listener import PreExportListener
@@ -171,21 +169,6 @@ class UVMExporter:
         s = re.sub(r'[^\w]', "_", s).upper()
         return s
 
-
-    def _get_class_name_new(self, node: Node) -> str:
-        """
-        Returns the class type name.
-        Shall be unique enough to prevent type name collisions
-        """
-        if self.reuse_class_definitions:
-            pass
-        else:
-            class_name = node.get_rel_path(
-                self.top.parent,
-                hier_separator="__", array_suffix="", empty_array_suffix=""
-            )
-
-        return class_name
 
     def _get_class_name(self, node: Node) -> str:
         """
