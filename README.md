@@ -11,29 +11,19 @@ Install from [PyPi](https://pypi.org/project/peakrdl-uvm) using pip:
 
     python3 -m pip install peakrdl-uvm
 
---------------------------------------------------------------------------------
 
-## Exporter Usage
-Pass the elaborated output of the [SystemRDL Compiler](http://systemrdl-compiler.readthedocs.io)
-to the exporter.
+## Example
 
-```python
-import sys
-from systemrdl import RDLCompiler, RDLCompileError
-from peakrdl_uvm import UVMExporter
+The easiest way to use PeakRDL-uvm is via the [PeakRDL command line tool](https://peakrdl.readthedocs.io/):
 
-rdlc = RDLCompiler()
+```bash
+# Install the command line tool
+python3 -m pip install peakrdl
 
-try:
-    rdlc.compile_file("path/to/my.rdl")
-    root = rdlc.elaborate()
-except RDLCompileError:
-    sys.exit(1)
-
-exporter = UVMExporter()
-exporter.export(root, "test.sv")
+# Generate UVM
+peakrdl uvm your_design.rdl -o your_design.sv
 ```
---------------------------------------------------------------------------------
+
 
 ## Reference
 
@@ -74,3 +64,24 @@ Perform the export!
       UVM factory.
     * If False (Default), UVM factory is disabled. Classes are created
       directly via new() constructors.
+
+### API Example
+Pass the elaborated output of the [SystemRDL Compiler](http://systemrdl-compiler.readthedocs.io)
+to the exporter.
+
+```python
+import sys
+from systemrdl import RDLCompiler, RDLCompileError
+from peakrdl_uvm import UVMExporter
+
+rdlc = RDLCompiler()
+
+try:
+    rdlc.compile_file("path/to/my.rdl")
+    root = rdlc.elaborate()
+except RDLCompileError:
+    sys.exit(1)
+
+exporter = UVMExporter()
+exporter.export(root, "test.sv")
+```
