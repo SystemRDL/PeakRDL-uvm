@@ -18,7 +18,7 @@ description = "Generate UVM register model from compiled SystemRDL input"
 readme = "README.md"
 license = {file = "LICENSE"}
 keywords = [
-    "SystmRDL", "PeakRDL", "CSR", "compiler", "tool", "registers", "generator",
+    "SystemRDL", "PeakRDL", "CSR", "compiler", "tool", "registers", "generator",
     "UVM",
 ]
 classifiers = [
