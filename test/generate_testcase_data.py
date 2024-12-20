@@ -27,6 +27,7 @@ UVMExporter().export(
     use_uvm_factory=False,
     reuse_class_definitions=True,
     export_as_package=True,
+    coverage=True,
 )
 os.rename(uvm_exportname, uvm_file)
 
@@ -36,33 +37,23 @@ UVMExporter().export(
     use_uvm_factory=True,
     reuse_class_definitions=True,
     export_as_package=True,
+    coverage=True,
 )
 os.rename(uvm_exportname, uvm_file)
 
 uvm_file = os.path.join(output_dir, testcase_name + "_uvm_nofac_noreuse_pkg.sv")
 UVMExporter().export(
     root, uvm_exportname,
-    use_uvm_factory=True,
+    use_uvm_factory=False,
     reuse_class_definitions=False,
     export_as_package=True,
+    coverage=True,
 )
 os.rename(uvm_exportname, uvm_file)
 
 #-------------------------------------------------------------------------------
 # Generate test logic
 #-------------------------------------------------------------------------------
-context = {
-    'testcase_name': testcase_name,
-    'root': root,
-    'rn': root.inst_name,
-    'isinstance': isinstance,
-    'AddrmapNode': AddrmapNode,
-    'RegfileNode': RegfileNode,
-    'MemNode': MemNode,
-    'RegNode': RegNode,
-    'FieldNode': FieldNode,
-}
-
 template = jj.Template("""
 module top();
     import uvm_pkg::*;
@@ -72,10 +63,12 @@ module top();
 
     initial begin
         {{testcase_name}}_uvm::{{testcase_name}} {{rn}};
+        uvm_reg::include_coverage("*", UVM_CVR_ALL);
         {{rn}} = new("{{rn}}");
         {{rn}}.build();
         {{rn}}.lock_model();
 
+        {%- set cntr = namespace(value=0) %}
         {% for node in root.descendants(unroll=True) %}
         // {{node}}
             {%- if isinstance(node, (AddrmapNode, RegfileNode, MemNode)) %}
@@ -100,9 +93,49 @@ module top();
         `ASSERT_EQ_INT({{node.get_path()}}.get_n_bits(), {{node.width}});
                 {%- endif %}
             {%- endif %}
+            {%- if isinstance(node, (RegfileNode, AddrmapNode)) -%}
+                {%- if node.has_children(RegNode) %}
+                    {%- if use_uvm_factory %}
+        `ASSERT_EQ_STR({{node.get_path()}}.addr_cg.option.name, "top.me.obj.addr_cg
+                        {%- if cntr.value != 0 -%}
+                            {{- "_(%d)" % cntr.value -}}
+                        {%- endif -%}
+                ");
+                {%- set cntr.value = cntr.value + 1 -%}
+                    {%- else %}
+        `ASSERT_EQ_STR({{node.get_path()}}.addr_cg.option.name, "{{"top." + node.get_path() + ".addr_cg"}}");
+                    {%- endif %}
+                {%- endif %}
+            {%- endif %}
         {%- endfor %}
     end
 endmodule
 """)
 
-template.stream(context).dump(os.path.join(output_dir, testcase_name + "_test.sv"))
+context = {
+    'testcase_name': testcase_name,
+    'root': root,
+    'rn': root.inst_name,
+    'use_uvm_factory': False, 
+    'isinstance': isinstance,
+    'AddrmapNode': AddrmapNode,
+    'RegfileNode': RegfileNode,
+    'MemNode': MemNode,
+    'RegNode': RegNode,
+    'FieldNode': FieldNode,
+}
+template.stream(context).dump(os.path.join(output_dir, testcase_name + "_nofac_test.sv"))
+
+context = {
+    'testcase_name': testcase_name,
+    'root': root,
+    'rn': root.inst_name,
+    'use_uvm_factory': True, 
+    'isinstance': isinstance,
+    'AddrmapNode': AddrmapNode,
+    'RegfileNode': RegfileNode,
+    'MemNode': MemNode,
+    'RegNode': RegNode,
+    'FieldNode': FieldNode,
+}
+template.stream(context).dump(os.path.join(output_dir, testcase_name + "_fac_test.sv"))
