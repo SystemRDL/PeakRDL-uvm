@@ -11,14 +11,14 @@ class {{get_class_name(node)}} extends uvm_reg_block;
     `uvm_object_utils({{get_class_name(node)}})
 {%- endif %}
     {{child_insts(node)|indent}}
-{%- if coverage and node.has_children(RegNode) -%}
+{%- if coverage and node.registers() -%}
     {{cov_bins(node)|indent}}
     {{cg_inst(node)|indent}}
 {% endif %}
     {{function_new(node)|indent}}
 
     {{function_build(node)|indent}}
-{% if coverage and node.has_children(RegNode) %}
+{% if coverage and node.registers() %}
     {{function_sample()|indent}}
 {% endif %}
 endclass : {{get_class_name(node)}}
@@ -83,7 +83,7 @@ endgroup: addr_cg
 //------------------------------------------------------------------------------
 {% macro function_new(node) -%}
 function new(string name = "{{get_class_name(node)}}");
-    {%- if coverage and node.has_children(RegNode) %}
+    {%- if coverage and node.registers() %}
     super.new(name, build_coverage(UVM_CVR_ADDR_MAP));
 
     if (has_coverage(UVM_CVR_ADDR_MAP)) begin
@@ -118,7 +118,7 @@ virtual function void build();
         {%- endif -%}
     {%- endfor %}
 
-    {%- if coverage and node.has_children(RegNode) %}
+    {%- if coverage and node.registers() %}
     void'(set_coverage(UVM_CVR_ADDR_MAP));
     {%- endif %}
 endfunction : build
