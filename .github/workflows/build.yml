@@ -19,11 +19,9 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - 3.5
-          - 3.6
-          - 3.7
-          - 3.8
-          - 3.9
+          - "3.7"
+          - "3.8"
+          - "3.9"
           - "3.10"
           - "3.11"
           - "3.12"
@@ -31,39 +29,23 @@ jobs:
           - os: ubuntu-latest
 
           # older versions need older OS
-          - python-version: 3.5
-            os: ubuntu-20.04
-          - python-version: 3.6
-            os: ubuntu-20.04
+          - python-version: "3.7"
+            os: ubuntu-22.04
+
+          - python-version: "3.8"
+            os: ubuntu-22.04
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.7 to bootstrap py3.6 and py3.5
-        if: ${{ matrix.python-version == '3.6' || matrix.python-version == '3.5' }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.7
-
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Python 3.6 & 3.7 cannot install directly from a pyproject.toml
-      # Instead, build a wheel from py3.7 and then install it
-      - name: Install via wheel
-        if: ${{ matrix.python-version == '3.6' || matrix.python-version == '3.5' }}
-        run: |
-          python3.7 -m pip install build
-          python3.7 -m build
-          python --version
-          python -m pip install ./dist/*.whl
-
       - name: Install
-        if: ${{ matrix.python-version != '3.6' && matrix.python-version != '3.5' }}
         run: |
           python -m pip install .
 
@@ -78,13 +60,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Install dependencies
         run: |
-          python -m pip install -U pylint
+          python -m pip install pylint
 
       - name: Install
         run: |
@@ -104,20 +86,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         name: Install Python
         with:
           python-version: "3.10"
 
       - name: Install dependencies
         run: |
-          python -m pip install -U build
+          python -m pip install build
 
       - name: Build
         run: python -m build
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: dist
           path: |
             dist/*.tar.gz
             dist/*.whl
@@ -135,9 +118,9 @@ jobs:
     # Only publish when a GitHub Release is created.
     if: github.event_name == 'release'
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          name: dist
           path: dist
 
       - uses: pypa/gh-action-pypi-publish@release/v1
