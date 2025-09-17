@@ -7,8 +7,8 @@ name = "peakrdl-uvm"
 dynamic = ["version"]
 requires-python = ">=3.5.2"
 dependencies = [
-    "systemrdl-compiler >= 1.27.0, < 2",
-    "jinja2>=2.9",
+    "systemrdl-compiler ~= 1.27",
+    "jinja2 >= 2.9",
 ]
 
 authors = [
