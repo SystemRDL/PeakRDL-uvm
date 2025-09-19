@@ -27,6 +27,7 @@ UVMExporter().export(
     use_uvm_factory=False,
     reuse_class_definitions=True,
     export_as_package=True,
+    coverage=True,
 )
 os.rename(uvm_exportname, uvm_file)
 
@@ -36,6 +37,7 @@ UVMExporter().export(
     use_uvm_factory=True,
     reuse_class_definitions=True,
     export_as_package=True,
+    coverage=True,
 )
 os.rename(uvm_exportname, uvm_file)
 
@@ -45,6 +47,7 @@ UVMExporter().export(
     use_uvm_factory=True,
     reuse_class_definitions=False,
     export_as_package=True,
+    coverage=True,
 )
 os.rename(uvm_exportname, uvm_file)
 
@@ -72,6 +75,7 @@ module top();
 
     initial begin
         {{testcase_name}}_uvm::{{testcase_name}} {{rn}};
+        uvm_reg::include_coverage("*", UVM_CVR_ALL);
         {{rn}} = new("{{rn}}");
         {{rn}}.build();
         {{rn}}.lock_model();
@@ -98,6 +102,14 @@ module top();
         `ASSERT_EQ_STR({{node.get_path()}}.get_full_name(), "{{node.get_path()}}");
         `ASSERT_EQ_INT({{node.get_path()}}.get_lsb_pos(), {{node.lsb}});
         `ASSERT_EQ_INT({{node.get_path()}}.get_n_bits(), {{node.width}});
+                {%- endif %}
+            {%- endif %}
+            {%- if isinstance(node, (AddrmapNode, RegfileNode)) %}
+                {%- if node.registers() %}
+        `ASSERT_EQ_INT({{node.get_path()}}.addr_cg.option.goal, 100);
+        `ASSERT_EQ_INT({{node.get_path()}}.addr_cg.addr_cp.option.goal, 100);
+        `ASSERT_EQ_INT({{node.get_path()}}.addr_cg.dir_cp.option.goal, 100);
+        `ASSERT_EQ_INT({{node.get_path()}}.addr_cg.access_cp.option.goal, 100);
                 {%- endif %}
             {%- endif %}
         {%- endfor %}

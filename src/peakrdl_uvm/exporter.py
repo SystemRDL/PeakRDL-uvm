@@ -100,9 +100,16 @@ class UVMExporter:
 
             If False (Default), UVM factory is disabled. Classes are created
             directly via new() constructors.
+        coverage: bool
+            If True, covergroup and corresponding sample function for accesses
+            to registers are declared. Coverage is collected when UVM_CVR_ADDR_MAP
+            coverage model is enabled.
+
+            If False (Default), covergroup and sample functions are not declated.
         """
         export_as_package = kwargs.pop("export_as_package", True)
         use_uvm_factory = kwargs.pop("use_uvm_factory", False)
+        coverage = kwargs.pop("coverage", False)
         self.reuse_class_definitions = kwargs.pop("reuse_class_definitions", True)
 
         # Check for stray kwargs
@@ -144,6 +151,7 @@ class UVMExporter:
             'roundup_to': self._roundup_to,
             'roundup_pow2': self._roundup_pow2,
             'use_uvm_factory': use_uvm_factory,
+            'coverage': coverage,
         }
 
         context.update(self.user_template_context)
