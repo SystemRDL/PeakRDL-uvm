@@ -117,7 +117,7 @@ class UVMExporter:
         if isinstance(node, AddrmapNode) and node.get_property('bridge'):
             node.env.msg.warning(
                 "UVM RAL generator does not have proper support for bridge addmaps yet. The 'bridge' property will be ignored.",
-                node.inst.property_src_ref.get('bridge', node.inst.inst_src_ref)
+                node.property_src_ref.get('bridge', node.inst_src_ref)
             )
 
         # First, traverse the model and collect some information
@@ -238,7 +238,7 @@ class UVMExporter:
             obj = self.namespace_db[type_name]
 
             # Sanity-check for collisions
-            if (obj is None) or (obj is not node.inst.original_def):
+            if (obj is None) or (obj is not node.original_def):
                 raise RuntimeError("Namespace collision! Type-name generation is not robust enough to create unique names!")
 
             # This object likely represents the existing class definition
@@ -247,7 +247,7 @@ class UVMExporter:
 
         # Need to emit a new definition
         # First, register it in the namespace
-        self.namespace_db[type_name] = node.inst.original_def
+        self.namespace_db[type_name] = node.original_def
         return True
 
 

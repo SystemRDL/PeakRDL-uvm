@@ -84,7 +84,7 @@ module top();
             {%- if isinstance(node, RegNode) %}
                 {%- if node.is_virtual %}
         `ASSERT_EQ_STR({{node.parent.get_path() + "." + node.inst_name}}.get_full_name(), "{{node.parent.get_path() + "." + node.inst_name}}");
-        `ASSERT_EQ_INT({{node.parent.get_path() + "." + node.inst_name}}.get_size(), {{node.inst.n_elements}});
+        `ASSERT_EQ_INT({{node.parent.get_path() + "." + node.inst_name}}.get_size(), {{node.n_elements}});
                 {%- else %}
         `ASSERT_EQ_STR({{node.get_path()}}.get_full_name(), "{{node.get_path()}}");
         `ASSERT_EQ_INT({{node.get_path()}}.get_address(), {{"'h%x" % node.absolute_address}});
