@@ -213,7 +213,7 @@ class UVMExporter:
         else:
             friendly_name = node.get_rel_path(self.top.parent)
 
-        return type(node.inst).__name__ + " - " + friendly_name
+        return node.component_type_name + " - " + friendly_name
 
 
     def _get_inst_name(self, node: Node) -> str:
