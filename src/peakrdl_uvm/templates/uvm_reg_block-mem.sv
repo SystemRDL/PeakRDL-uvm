@@ -7,6 +7,7 @@
 {%- if class_needs_definition(node) %}
 // {{get_class_friendly_name(node)}}
 class {{get_class_name(node)}} extends uvm_reg_block;
+    `uvm_object_utils({{get_class_name(node)}})
 {%- if use_uvm_factory %}
     `uvm_object_utils({{get_class_name(node)}})
 {%- endif %}
