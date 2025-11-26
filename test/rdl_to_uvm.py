@@ -19,4 +19,5 @@ UVMExporter().export(
     use_uvm_factory=False,
     reuse_class_definitions=True,
     export_as_package=True,
+    coverage=True,
 )

@@ -48,6 +48,14 @@ class Exporter(ExporterSubcommandPlugin):
             help="If set, class definitions and class instances are created using the UVM factory"
         )
 
+        arg_group.add_argument(
+            "--covearge",
+            dest="covearge",
+            default=False,
+            action="store_true",
+            help="If set, covergroup and sample function for accesses to registers are declared"
+        )
+
 
     def do_export(self, top_node: 'AddrmapNode', options: 'argparse.Namespace') -> None:
         x = UVMExporter(
@@ -59,5 +67,6 @@ class Exporter(ExporterSubcommandPlugin):
             options.output,
             export_as_package=(options.file_type == "package"),
             reuse_class_definitions=(options.type_style == "lexical"),
-            use_uvm_factory=options.use_factory
+            use_uvm_factory=options.use_factory,
+            coverage=options.coverage
         )
